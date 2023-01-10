@@ -1,0 +1,7 @@
+LIBRARY
+
+EXPORTS
+GetSignatureInterface=GetSignatureInterface
+GetKeyStorageInterface=GetKeyStorageInterface
+DllRegisterServer =DllRegisterServer ;
+DllUnregisterServer =DllUnregisterServer ;
