@@ -55,6 +55,13 @@ public:
 	virtual void init() = 0;
 };
 
+class BOP224 : public BOP
+{
+public:
+
+	virtual bool un() { return 1; }
+
+};
 class BOP256 : public BOP
 {
 public:
@@ -62,10 +69,25 @@ public:
 	virtual bool un() { return 1;  }
 
 };
+class BOP384 : public BOP
+{
+public:
+	virtual bool un() { return 1; }
+};
 class BOP512 : public BOP
 {
 public:
 	virtual bool un() { return 1; }
+};
+class HASH224 : public HASH
+{
+public:
+
+	virtual void init()
+	{
+		rhash_sha3_224_init(&ctx);
+		rr.resize(28);
+	}
 };
 
 class HASH256 : public HASH
@@ -89,6 +111,17 @@ public:
 	}
 };
 
+class HASH384 : public HASH
+{
+public:
+
+	virtual void init()
+	{
+		rhash_sha3_384_init(&ctx);
+		rr.resize(48);
+	}
+};
+
 NTSTATUS WINAPI GetHashInterface(
 	_In_   LPCWSTR pszProviderName,
 	_In_   LPCWSTR pszAlgId,
@@ -98,7 +131,7 @@ NTSTATUS WINAPI GetHashInterface(
 {
 	if (!ppFunctionTable)
 		return -1;
-	if (wcsicmp(pszAlgId,SHA3_256_ALGORITHM) != 0 && wcsicmp(pszAlgId, SHA3_512_ALGORITHM) != 0)
+	if (wcsicmp(pszAlgId, SHA3_224_ALGORITHM) != 0 && wcsicmp(pszAlgId,SHA3_256_ALGORITHM) != 0 && wcsicmp(pszAlgId, SHA3_512_ALGORITHM) != 0 && wcsicmp(pszAlgId, SHA3_384_ALGORITHM) != 0)
 		return -1;
 	BCRYPT_HASH_FUNCTION_TABLE m;
 	*ppFunctionTable = &m;
@@ -110,8 +143,12 @@ NTSTATUS WINAPI GetHashInterface(
 		) -> NTSTATUS
 	{
 		BOP* b = 0;
+		if (wcsicmp(pszAlgId, SHA3_224_ALGORITHM) == 0)
+			b = new BOP224;
 		if (wcsicmp(pszAlgId,SHA3_256_ALGORITHM) == 0)
 			b = new BOP256;
+		if (wcsicmp(pszAlgId, SHA3_384_ALGORITHM) == 0)
+			b = new BOP384;
 		if (wcsicmp(pszAlgId, SHA3_512_ALGORITHM) == 0)
 			b = new BOP512;
 		if (!b)
@@ -144,12 +181,20 @@ NTSTATUS WINAPI GetHashInterface(
 			else
 			{
 				DWORD r = sizeof(HASH);
+				if (dynamic_cast<BOP224*>((BOP*)hObject))
+					r = sizeof(BOP224);
 				if (dynamic_cast<BOP256*>((BOP*)hObject))
 					r = sizeof(BOP256);
+				if (dynamic_cast<BOP384*>((BOP*)hObject))
+					r = sizeof(BOP384);
 				if (dynamic_cast<BOP512*>((BOP*)hObject))
 					r = sizeof(BOP512);
+				if (dynamic_cast<HASH224*>((HASH*)hObject))
+					r = sizeof(HASH224);
 				if (dynamic_cast<HASH256*>((HASH*)hObject))
 					r = sizeof(HASH256);
+				if (dynamic_cast<HASH384*>((HASH*)hObject))
+					r = sizeof(HASH384);
 				if (dynamic_cast<HASH512*>((HASH*)hObject))
 					r = sizeof(HASH512);
 
@@ -167,6 +212,10 @@ NTSTATUS WINAPI GetHashInterface(
 			else
 			{
 				DWORD r = 32;
+				if (dynamic_cast<HASH224*>((HASH*)hObject))
+					r = 28;
+				if (dynamic_cast<HASH384*>((HASH*)hObject))
+					r = 48;
 				if (dynamic_cast<HASH512*>((HASH*)hObject))
 					r = 64;
 				memcpy(pbOutput, &r, 4);
@@ -217,8 +266,12 @@ NTSTATUS WINAPI GetHashInterface(
 			return (NTSTATUS)-1;
 		BOP* b = (BOP*)hAlgorithm;
 		HASH* ctx = 0;
+		if (dynamic_cast<BOP224*>(b))
+			ctx = new HASH224;
 		if (dynamic_cast<BOP256*>(b))
 			ctx = new HASH256;
+		if (dynamic_cast<BOP384*>(b))
+			ctx = new HASH384;
 		if (dynamic_cast<BOP512*>(b))
 			ctx = new HASH512;
 		if (!ctx)
@@ -265,8 +318,12 @@ NTSTATUS WINAPI GetHashInterface(
 			return (NTSTATUS)-1;
 		HASH* ctx = (HASH*)hHash;
 		HASH* a1 = 0;
+		if (dynamic_cast<HASH224*>(ctx))
+			a1 = new HASH224;
 		if (dynamic_cast<HASH256*>(ctx))
 			a1 = new HASH256;
+		if (dynamic_cast<HASH384*>(ctx))
+			a1 = new HASH384;
 		if (dynamic_cast<HASH512*>(ctx))
 			a1 = new HASH512;
 		a1->ctx = ctx->ctx;
@@ -312,9 +369,9 @@ HRESULT __stdcall DllRegisterServer()
 	reg.pUM->rgpInterfaces = rif;
 	rif[0] = &r1;
 	r1.dwInterface = BCRYPT_HASH_INTERFACE;
-	PWSTR u[] = { (PWSTR)SHA3_256_ALGORITHM,(PWSTR)SHA3_512_ALGORITHM};
+	PWSTR u[] = { (PWSTR)SHA3_224_ALGORITHM,(PWSTR)SHA3_256_ALGORITHM,(PWSTR)SHA3_384_ALGORITHM,(PWSTR)SHA3_512_ALGORITHM };
 	r1.rgpszFunctions = u;
-	r1.cFunctions = 2;
+	r1.cFunctions = 4;
 
 
 	if (1)
@@ -328,7 +385,9 @@ HRESULT __stdcall DllRegisterServer()
 			return E_FAIL;
 	}
 	
+	BCryptAddContextFunctionProvider(CRYPT_LOCAL, 0, BCRYPT_HASH_INTERFACE, SHA3_224_ALGORITHM, ProviderB, CRYPT_PRIORITY_TOP);
 	BCryptAddContextFunctionProvider(CRYPT_LOCAL, 0, BCRYPT_HASH_INTERFACE, SHA3_256_ALGORITHM, ProviderB, CRYPT_PRIORITY_TOP);
+	BCryptAddContextFunctionProvider(CRYPT_LOCAL, 0, BCRYPT_HASH_INTERFACE, SHA3_384_ALGORITHM, ProviderB, CRYPT_PRIORITY_TOP);
 	BCryptAddContextFunctionProvider(CRYPT_LOCAL, 0, BCRYPT_HASH_INTERFACE, SHA3_512_ALGORITHM, ProviderB, CRYPT_PRIORITY_TOP);
 	return S_OK;
 }
@@ -339,8 +398,10 @@ HRESULT __stdcall DllUnregisterServer()
 	GetSystemDirectory(y.data(), 1000);
 	wcscat_s(y.data(), 1000, L"\\cngsha3.dll");
 
-	BCryptRemoveContextFunctionProvider(CRYPT_LOCAL, ProviderB, BCRYPT_HASH_INTERFACE, SHA3_512_ALGORITHM, ProviderB);
+	BCryptRemoveContextFunctionProvider(CRYPT_LOCAL, ProviderB, BCRYPT_HASH_INTERFACE, SHA3_224_ALGORITHM, ProviderB);
 	BCryptRemoveContextFunctionProvider(CRYPT_LOCAL, ProviderB, BCRYPT_HASH_INTERFACE, SHA3_256_ALGORITHM, ProviderB);
+	BCryptRemoveContextFunctionProvider(CRYPT_LOCAL, ProviderB, BCRYPT_HASH_INTERFACE, SHA3_384_ALGORITHM, ProviderB);
+	BCryptRemoveContextFunctionProvider(CRYPT_LOCAL, ProviderB, BCRYPT_HASH_INTERFACE, SHA3_512_ALGORITHM, ProviderB);
 
 	BCryptUnregisterProvider(ProviderB);
 	DeleteFile(y.data());

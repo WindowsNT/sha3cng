@@ -66,15 +66,14 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		return 0;
 	typedef HRESULT(__stdcall* r4)();
 
-	r4 R = (r4)GetProcAddress(h, "DllUnregisterServer");
-	if (R)
-		R();
-	R = (r4)GetProcAddress(h, "DllRegisterServer");
+	auto R = (r4)GetProcAddress(h, "DllRegisterServer");
 	if (R)
 		R();
 
-//	HASH hash(SHA3_256_ALGORITHM);
-	HASH hash(SHA3_512_ALGORITHM);
+	//	HASH hash(SHA3_224_ALGORITHM);
+		HASH hash(SHA3_256_ALGORITHM);
+	//	HASH hash(SHA3_384_ALGORITHM);
+	//	HASH hash(SHA3_512_ALGORITHM);
 	hash.hash((BYTE*)"Hello", 5);
 	std::vector<BYTE> v;
 	hash.get(v);
