@@ -14,14 +14,14 @@ Supports 512,768,1024 bits
 The names are:
 
 const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
-#define SHA3_224_ALGORITHM  L"SHA3-224"
+`#define SHA3_224_ALGORITHM  L"SHA3-224"
 #define SHA3_256_ALGORITHM  L"SHA3-256"
 #define SHA3_384_ALGORITHM  L"SHA3-384"
 #define SHA3_512_ALGORITHM  L"SHA3-512"
 #define KYBER_512_ALGORITHM  L"KYBER-512"
 #define KYBER_768_ALGORITHM  L"KYBER-768"
 #define KYBER_1024_ALGORITHM  L"KYBER-1024"
-
+`
 # Instructions
 * Install the Cryptographic Provider SDK (https://www.microsoft.com/en-us/download/details.aspx?id=30688)
 * In both dll and test project properties, set the C++ include path to the above CNG SDK (mine is set at c:\Windows Kits\10\Cryptographic Provider Development Kit\include)
