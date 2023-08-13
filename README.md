@@ -13,8 +13,8 @@ Supports 512,768,1024 bits
 # Defines
 The names are:
 
-const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 ```
+const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 #define SHA3_224_ALGORITHM  L"SHA3-224"
 #define SHA3_256_ALGORITHM  L"SHA3-256"
 #define SHA3_384_ALGORITHM  L"SHA3-384"
