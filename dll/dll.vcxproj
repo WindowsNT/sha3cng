@@ -76,9 +76,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include;..\kyber\sha3\include;..\kyber\subtle\include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,9 +94,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include;..\kyber\sha3\include;..\kyber\subtle\include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>
@@ -113,9 +113,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include;..\kyber\sha3\include;..\kyber\subtle\include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -131,9 +131,9 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>c:\Windows Kits\10\Cryptographic Provider Development Kit\include;..\kyber\sha3\include;..\kyber\subtle\include;</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>Disabled</Optimization>
     </ClCompile>
     <Link>

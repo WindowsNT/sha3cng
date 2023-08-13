@@ -1,19 +1,26 @@
 # cngsha3
 
-An implementation of SHA-3 (using librhash https://github.com/rhash/RHash/tree/master/librhash) into CNG (Cryptography New Generation) API so all Windows apps can use SHA-3.
+An implementation of New algorhtms into CNG (Cryptography New Generation) API so all Windows apps can use them.
 Visual Studio 2022 Solution included.
 
 # Algorithms
+SHA-3 (using librhash https://github.com/rhash/RHash/tree/master/librhash)
 Supports SHA-224, SHA-256, SHA-384 and SHA-512
+
+CRYSTALS-Kyber: https://github.com/itzmeanjan/kyber
+Supports 512,768,1024 bits
 
 # Defines
 The names are:
 
-* #define SHA3_224_ALGORITHM  L"SHA3-224"
-* #define SHA3_256_ALGORITHM  L"SHA3-256"
-* #define SHA3_384_ALGORITHM  L"SHA3-384"
-* #define SHA3_512_ALGORITHM  L"SHA3-512"
-* const wchar_t* ProviderB = L"Michael Chourdakis CNG SHA-3 Implementation";
+const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
+#define SHA3_224_ALGORITHM  L"SHA3-224"
+#define SHA3_256_ALGORITHM  L"SHA3-256"
+#define SHA3_384_ALGORITHM  L"SHA3-384"
+#define SHA3_512_ALGORITHM  L"SHA3-512"
+#define KYBER_512_ALGORITHM  L"KYBER-512"
+#define KYBER_768_ALGORITHM  L"KYBER-768"
+#define KYBER_1024_ALGORITHM  L"KYBER-1024"
 
 # Instructions
 * Install the Cryptographic Provider SDK (https://www.microsoft.com/en-us/download/details.aspx?id=30688)

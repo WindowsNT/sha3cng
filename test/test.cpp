@@ -57,6 +57,137 @@ public:
 };
 
 
+/*
+class ED
+{
+	BCRYPT_ALG_HANDLE h;
+	BCRYPT_HASH_HANDLE ha;
+public:
+
+	ED(LPCWSTR alg = KYBER_512_ALGORITHM,const char* pwd = 0,size_t pwdlen = 0)
+	{
+		BCryptOpenAlgorithmProvider(&h, alg, 0, 0);
+		if (h)
+		{
+//			HASH h2(BCRYPT_SHA256_ALGORITHM);
+			HASH h2(SHA3_256_ALGORITHM);
+			h2.hash((BYTE*)pwd, (DWORD)pwdlen);
+			std::vector<unsigned char> rx;
+			h2.get(rx);
+			BCryptGenerateSymmetricKey(h, &ha, 0, 0, (PUCHAR)rx.data(), (ULONG)rx.size(), 0);
+		}
+	}
+
+	bool e(const BYTE* d, DWORD sz,std::vector<unsigned char>& out)
+	{
+		if (!ha)
+			return false;
+		ULONG u = 0;
+		auto nt = BCryptEncrypt(ha, (UCHAR*)d, sz, 0,0,0,0,0,&u, BCRYPT_BLOCK_PADDING);
+		if (nt == 0)
+		{
+			out.resize(u);
+			nt = BCryptEncrypt(ha, (UCHAR*)d,(ULONG) sz, 0, 0, 0, (PUCHAR)out.data(), (ULONG)out.size(), &u, BCRYPT_BLOCK_PADDING);
+			out.resize(u);
+		}
+		return (nt == 0) ? true : false;
+	}
+
+	bool d(const BYTE* d, DWORD sz, std::vector<unsigned char>& out)
+	{
+		if (!ha)
+			return false;
+		ULONG u = 0;
+		auto nt = BCryptDecrypt(ha, (UCHAR*)d, sz, 0, 0, 0, 0, 0, &u, BCRYPT_BLOCK_PADDING);
+		if (nt == 0)
+		{
+			out.resize(u);
+			nt = BCryptDecrypt(ha, (UCHAR*)d, (ULONG)sz, 0, 0, 0, (PUCHAR)out.data(), (ULONG)out.size(), &u, BCRYPT_BLOCK_PADDING);
+			out.resize(u);
+		}
+		return (nt == 0) ? true : false;
+	}
+
+	~ED()
+	{
+		if (ha)
+			BCryptDestroyKey(ha);
+		ha = 0;
+		if (h)
+			BCryptCloseAlgorithmProvider(h, 0);
+		h = 0;
+	}
+};
+
+*/
+
+class PK
+{
+	BCRYPT_ALG_HANDLE h;
+	BCRYPT_HASH_HANDLE ha;
+public:
+
+	PK(LPCWSTR alg = KYBER_512_ALGORITHM,int bits = 1024)
+	{
+		BCryptOpenAlgorithmProvider(&h, alg, 0, 0);
+		if (h)
+		{
+			auto st = BCryptGenerateKeyPair(h, &ha, bits, 0);
+			st = BCryptFinalizeKeyPair(ha, 0);
+/*			//			HASH h2(BCRYPT_SHA256_ALGORITHM);
+			HASH h2(SHA3_256_ALGORITHM);
+			h2.hash((BYTE*)pwd, (DWORD)pwdlen);
+			std::vector<unsigned char> rx;
+			h2.get(rx);
+			BCryptGenerateSymmetricKey(h, &ha, 0, 0, (PUCHAR)rx.data(), (ULONG)rx.size(), 0);
+			*/
+		}
+	}
+
+	bool e(const BYTE* d, DWORD sz, std::vector<unsigned char>& out,HASH* h = 0)
+	{
+		if (!ha)
+			return false;
+		ULONG u = 0;
+
+		std::vector<unsigned char> HashInstead;
+		auto nt = BCryptEncrypt(ha, (UCHAR*)d, sz, 0, 0, 0, 0, 0, &u, BCRYPT_PAD_PKCS1);
+		if (nt == 0)
+		{
+			out.resize(u);
+			nt = BCryptEncrypt(ha, (UCHAR*)d, (ULONG)sz, 0, 0, 0, (PUCHAR)out.data(), (ULONG)out.size(), &u, BCRYPT_PAD_PKCS1);
+			out.resize(u);
+		}
+		return (nt == 0) ? true : false;
+	}
+
+	bool d(const BYTE* d, DWORD sz, std::vector<unsigned char>& out)
+	{
+		if (!ha)
+			return false;
+		ULONG u = 0;
+		auto nt = BCryptDecrypt(ha, (UCHAR*)d, sz, 0, 0, 0, 0, 0, &u, BCRYPT_PAD_PKCS1);
+		if (nt == 0)
+		{
+			out.resize(u);
+			nt = BCryptDecrypt(ha, (UCHAR*)d, (ULONG)sz, 0, 0, 0, (PUCHAR)out.data(), (ULONG)out.size(), &u, BCRYPT_PAD_PKCS1);
+			out.resize(u);
+		}
+		return (nt == 0) ? true : false;
+	}
+
+	~PK()
+	{
+		if (ha)
+			BCryptDestroyKey(ha);
+		ha = 0;
+		if (h)
+			BCryptCloseAlgorithmProvider(h, 0);
+		h = 0;
+	}
+};
+
+
 
 
 int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -70,13 +201,43 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 	if (R)
 		R();
 
-	//	HASH hash(SHA3_224_ALGORITHM);
+	if (1)
+	{
+		// With existing algoriths
+		// HASH hash(BCRYPT_SHA256_ALGORITHM);
+
+		// New ones
+		//	HASH hash(SHA3_224_ALGORITHM);
 		HASH hash(SHA3_256_ALGORITHM);
-	//	HASH hash(SHA3_384_ALGORITHM);
-	//	HASH hash(SHA3_512_ALGORITHM);
-	hash.hash((BYTE*)"Hello", 5);
-	std::vector<BYTE> v;
-	hash.get(v);
+		//	HASH hash(SHA3_384_ALGORITHM);
+		//	HASH hash(SHA3_512_ALGORITHM);
+		hash.hash((BYTE*)"Hello", 5);
+		std::vector<BYTE> v;
+		hash.get(v);
+	}
+
+	if (1)
+	{
+		// Can be used with existing algorithms
+//		PK e(BCRYPT_RSA_ALGORITHM);
+
+		// New algorithms
+//		PK e(KYBER_512_ALGORITHM);
+//		PK e(KYBER_768_ALGORITHM);
+		PK e(KYBER_1024_ALGORITHM);
+		std::vector<unsigned char> out1;
+		std::vector<unsigned char> out2;
+
+		// 32 bytes for KYBER PKI input so let's hash our data with SHA-3 256
+		HASH hash(SHA3_256_ALGORITHM);
+		std::vector<unsigned char> outx(32);
+		hash.hash((BYTE*)"Hello", 5);
+		hash.get(outx);
+		e.e((const BYTE*)outx.data(), (DWORD)outx.size(), out1);
+		e.d(out1.data(), (ULONG)out1.size(), out2);
+		assert(memcmp(outx.data(), out2.data(), out2.size()) == 0);
+	}
+
 
 	R = (r4)GetProcAddress(h, "DllUnregisterServer");
 	if (R)
