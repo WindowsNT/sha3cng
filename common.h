@@ -10,3 +10,4 @@ inline const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 #define DILITHIUM_2_ALGORITHM  L"DILITHIUM-2"
 #define DILITHIUM_3_ALGORITHM  L"DILITHIUM-3"
 #define DILITHIUM_5_ALGORITHM  L"DILITHIUM-5"
+#define SPHINCS_ALGORITHM  L"SPHINCS"

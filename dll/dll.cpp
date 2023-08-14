@@ -22,17 +22,21 @@ BOOL WINAPI DllMain(
 #ifdef _WIN64
 #pragma comment(lib,"..\\x64\\Debug\\kyberlib.lib")
 #pragma comment(lib,"..\\x64\\Debug\\dilithiumlib.lib")
+#pragma comment(lib,"..\\x64\\Debug\\sphincslib.lib")
 #else
 #pragma comment(lib,"..\\Win32\\Debug\\kyberlib.lib")
 #pragma comment(lib,"..\\Win32\\Debug\\dilithiumlib.lib")
+#pragma comment(lib,"..\\Win32\\Debug\\sphincslib.lib")
 #endif
 #else
 #ifdef _WIN64
 #pragma comment(lib,"..\\x64\\Release\\kyberlib.lib")
 #pragma comment(lib,"..\\x64\\Release\\dilithiumlib.lib")
+#pragma comment(lib,"..\\x64\\Release\\sphincslib.lib")
 #else
 #pragma comment(lib,"..\\Win32\\Release\\kyberlib.lib")
 #pragma comment(lib,"..\\Win32\\Release\\dilithiumlib.lib")
+#pragma comment(lib,"..\\Win32\\Release\\sphincslib.lib")
 #endif
 #endif
 
@@ -376,6 +380,13 @@ NTSTATUS WINAPI DilithiumGetAsymmetricEncryptionInterface(
 	_In_   ULONG dwFlags
 );
 
+NTSTATUS WINAPI SphincsGetAsymmetricEncryptionInterface(
+	_In_   LPCWSTR pszProviderName,
+	_In_   LPCWSTR pszAlgId,
+	_Out_  BCRYPT_ASYMMETRIC_ENCRYPTION_FUNCTION_TABLE** ppFunctionTable,
+	_In_   ULONG dwFlags
+);
+
 NTSTATUS WINAPI GetAsymmetricEncryptionInterface(
 	_In_   LPCWSTR pszProviderName,
 	_In_   LPCWSTR pszAlgId,
@@ -387,6 +398,8 @@ NTSTATUS WINAPI GetAsymmetricEncryptionInterface(
 		return KyberGetAsymmetricEncryptionInterface(pszProviderName, pszAlgId, ppFunctionTable, dwFlags);
 	if (_wcsicmp(pszAlgId, DILITHIUM_2_ALGORITHM) == 0 || _wcsicmp(pszAlgId, DILITHIUM_3_ALGORITHM) == 0 || _wcsicmp(pszAlgId, DILITHIUM_5_ALGORITHM) == 0)
 		return DilithiumGetAsymmetricEncryptionInterface(pszProviderName, pszAlgId, ppFunctionTable, dwFlags);
+	if (_wcsicmp(pszAlgId, SPHINCS_ALGORITHM) == 0)
+		return SphincsGetAsymmetricEncryptionInterface(pszProviderName, pszAlgId, ppFunctionTable, dwFlags);
 	return STATUS_NOT_SUPPORTED;
 }
 
@@ -429,9 +442,9 @@ HRESULT __stdcall DllRegisterServer()
 	r1.rgpszFunctions = u;
 	r1.cFunctions = 4;
 	PWSTR u2[] = { (PWSTR)KYBER_512_ALGORITHM,(PWSTR)KYBER_768_ALGORITHM,(PWSTR)KYBER_1024_ALGORITHM,
-	(PWSTR)DILITHIUM_2_ALGORITHM,(PWSTR)DILITHIUM_3_ALGORITHM,(PWSTR)DILITHIUM_5_ALGORITHM };
+	(PWSTR)DILITHIUM_2_ALGORITHM,(PWSTR)DILITHIUM_3_ALGORITHM,(PWSTR)DILITHIUM_5_ALGORITHM,(PWSTR)SPHINCS_ALGORITHM};
 	r2.rgpszFunctions = u2;
-	r2.cFunctions = 6;
+	r2.cFunctions = 7;
 
 	reg.pUM->cInterfaces = 2;
 

@@ -398,6 +398,28 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		assert(ver);
 	}
 
+
+	if (1)
+	{
+		auto algo = SPHINCS_ALGORITHM;
+
+		DS e1(algo);
+		e1.gen();
+
+		std::vector<unsigned char> key;
+		e1.exp(key);
+
+		DS e2(algo);
+		e2.imp(key);
+
+		std::vector<unsigned char> out1;
+		std::vector<unsigned char> out2;
+
+		e1.sign((const BYTE*)"Hello", 5, out1);
+		auto ver = e2.verify((const BYTE*)"Hello", 5, out1.data(), (DWORD)out1.size());
+		assert(ver);
+	}
+
 	R = (r4)GetProcAddress(h, "DllUnregisterServer");
 	if (R)
 		R();

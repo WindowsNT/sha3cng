@@ -13,6 +13,8 @@ Supports 512,768,1024 bits
 CRYSTALS-Dilithium: https://github.com/itzmeanjan/dilithium
 Supports 2,3,5
 
+CRYSTALS-Sphincs: https://github.com/itzmeanjan/sphincs
+
 # Defines
 The names are:
 
@@ -28,6 +30,7 @@ const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 #define DILITHIUM_2_ALGORITHM  L"DILITHIUM-2"
 #define DILITHIUM_3_ALGORITHM  L"DILITHIUM-3"
 #define DILITHIUM_5_ALGORITHM  L"DILITHIUM-5"
+#define SPHINCS_ALGORITHM  L"SPHINCS"
 
 ```
 
