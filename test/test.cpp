@@ -224,6 +224,98 @@ public:
 };
 
 
+class DS
+{
+	BCRYPT_ALG_HANDLE h;
+	BCRYPT_HASH_HANDLE ha;
+	std::wstring talg;
+public:
+
+	DS(LPCWSTR alg = DILITHIUM_2_ALGORITHM)
+	{
+		talg = alg;
+		BCryptOpenAlgorithmProvider(&h, alg, 0, 0);
+	}
+
+	void gen(int bits = 512)
+	{
+		if (ha)
+			return;
+		if (h)
+		{
+			auto st = BCryptGenerateKeyPair(h, &ha, bits, 0);
+			st = BCryptFinalizeKeyPair(ha, 0);
+		}
+
+	}
+
+	bool sign(const BYTE* d, DWORD sz, std::vector<unsigned char>& out, HASH* h = 0)
+	{
+		if (!ha)
+			return false;
+		ULONG u = 0;
+
+		ULONG r = 0;
+		BCryptSignHash(ha, 0, (BYTE*)d, sz, 0, 0, &r, 0);
+		out.resize(r);
+		BCryptSignHash(ha, 0, (BYTE*)d, sz, (PUCHAR)out.data(), r, &r, 0);
+		out.resize(r);
+		return r;
+	}
+
+	bool imp(std::vector<unsigned char>& key)
+	{
+		if (ha)
+			return false;
+
+		auto str = BCRYPT_RSAFULLPRIVATE_BLOB;
+		if (talg != BCRYPT_RSA_ALGORITHM)
+			str = L"";
+		auto r = BCryptImportKeyPair(h, 0, str, &ha, key.data(), (DWORD)key.size(), 0);
+		if (ha)
+			return true;
+		return false;
+	}
+
+	bool exp(std::vector<unsigned char>& out)
+	{
+		if (!ha)
+			return false;
+		auto str = BCRYPT_RSAFULLPRIVATE_BLOB;
+		if (talg != BCRYPT_RSA_ALGORITHM)
+			str = L"";
+		ULONG cb = 0;
+		auto st = BCryptExportKey(ha, 0, str, 0, 0, &cb, 0);
+		if (st != 0)
+			return false;
+		out.resize(cb);
+		st = BCryptExportKey(ha, 0, str, (PUCHAR)out.data(), (DWORD)out.size(), &cb, 0);
+		if (st != 0)
+			return false;
+		out.resize(cb);
+		return true;
+	}
+
+	bool verify(const BYTE* msg, DWORD msz, const BYTE* sig, DWORD sz)
+	{
+		if (!ha)
+			return false;
+		auto nt = BCryptVerifySignature(ha, 0,(PUCHAR)msg, msz,(PUCHAR) sig, sz, 0);
+		if (nt == 0)
+			return true;
+		return false;
+	}
+
+	~DS()
+	{
+		if (ha)
+			BCryptDestroyKey(ha);
+		ha = 0;
+		if (h)
+			BCryptCloseAlgorithmProvider(h, 0);
+		h = 0;
+	}
+};
 
 
 int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
@@ -267,10 +359,10 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		e1.gen(1024);
 
 		std::vector<unsigned char> key;
-		e1.exp(key);
+//		e1.exp(key);
 	
 		PK e2(algo);
-		e2.imp(key);
+	//	e2.imp(key);
 
 		std::vector<unsigned char> out1;
 		std::vector<unsigned char> out2;
@@ -281,10 +373,30 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		hash.hash((BYTE*)"Hello", 5);
 		hash.get(outx);
 		e1.e((const BYTE*)outx.data(), (DWORD)outx.size(), out1);
-		e2.d(out1.data(), (ULONG)out1.size(), out2);
+		e1.d(out1.data(), (ULONG)out1.size(), out2);
 		assert(memcmp(outx.data(), out2.data(), out2.size()) == 0);
 	}
 
+	if (1)
+	{
+		auto algo = DILITHIUM_5_ALGORITHM;
+
+		DS e1(algo);
+		e1.gen();
+
+		std::vector<unsigned char> key;
+		e1.exp(key);
+
+		DS e2(algo);
+		e2.imp(key);
+
+		std::vector<unsigned char> out1;
+		std::vector<unsigned char> out2;
+
+		e1.sign((const BYTE*)"Hello", 5, out1);
+		auto ver = e2.verify((const BYTE*)"Hello", 5, out1.data(),(DWORD) out1.size());
+		assert(ver);
+	}
 
 	R = (r4)GetProcAddress(h, "DllUnregisterServer");
 	if (R)

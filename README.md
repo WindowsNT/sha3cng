@@ -10,6 +10,9 @@ Supports SHA-224, SHA-256, SHA-384 and SHA-512
 CRYSTALS-Kyber: https://github.com/itzmeanjan/kyber
 Supports 512,768,1024 bits
 
+CRYSTALS-Dilithium: https://github.com/itzmeanjan/dilithium
+Supports 2,3,5
+
 # Defines
 The names are:
 
@@ -22,6 +25,10 @@ const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 #define KYBER_512_ALGORITHM  L"KYBER-512"
 #define KYBER_768_ALGORITHM  L"KYBER-768"
 #define KYBER_1024_ALGORITHM  L"KYBER-1024"
+#define DILITHIUM_2_ALGORITHM  L"DILITHIUM-2"
+#define DILITHIUM_3_ALGORITHM  L"DILITHIUM-3"
+#define DILITHIUM_5_ALGORITHM  L"DILITHIUM-5"
+
 ```
 
 # Instructions

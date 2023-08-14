@@ -1,4 +1,5 @@
-const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
+#pragma once
+inline const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 #define SHA3_224_ALGORITHM  L"SHA3-224"
 #define SHA3_256_ALGORITHM  L"SHA3-256"
 #define SHA3_384_ALGORITHM  L"SHA3-384"
@@ -6,3 +7,6 @@ const wchar_t* ProviderB = L"Michael Chourdakis CNG Implementations";
 #define KYBER_512_ALGORITHM  L"KYBER-512"
 #define KYBER_768_ALGORITHM  L"KYBER-768"
 #define KYBER_1024_ALGORITHM  L"KYBER-1024"
+#define DILITHIUM_2_ALGORITHM  L"DILITHIUM-2"
+#define DILITHIUM_3_ALGORITHM  L"DILITHIUM-3"
+#define DILITHIUM_5_ALGORITHM  L"DILITHIUM-5"
