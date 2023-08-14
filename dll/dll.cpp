@@ -10,11 +10,6 @@
 #include <memory>
 
 
-#include "..\\kyber\\include\\kyber512_kem.hpp"
-#include "..\\kyber\\include\\kyber768_kem.hpp"
-#include "..\\kyber\\include\\kyber1024_kem.hpp"
-#include "..\\kyber\\include\\pke.hpp"
-
 
 #pragma comment (lib,"C:\\Windows Kits\\10\\Cryptographic Provider Development Kit\\Lib\\x64\\bcrypt_provider.lib")
 #pragma comment (lib,"C:\\Windows Kits\\10\\Cryptographic Provider Development Kit\\Lib\\x64\\ncrypt_provider.lib")
@@ -359,8 +354,20 @@ namespace SHA3
 
 }
 
+#include "..\\kyber\\include\\kyber512_kem.hpp"
+#include "..\\kyber\\include\\kyber768_kem.hpp"
+#include "..\\kyber\\include\\kyber1024_kem.hpp"
+#include "..\\kyber\\include\\pke.hpp"
+
+//#include "..\\dilithium\\include\\dilithium5.hpp"
+//#include "..\\dilithium\\include\\dilithium3.hpp"
+//#include "..\\dilithium\\include\\dilithium2.hpp"
+//#include "..\\dilithium\\include\\dilithium.hpp"
+
+
 namespace PK_ALGORITHMS
 {
+
 	class PKA
 	{
 	public:
@@ -696,6 +703,71 @@ namespace PK_ALGORITHMS
 			_In_     ULONG dwFlags
 			)
 		{
+			BOP* k = (BOP*)hAlgorithm;
+			if (dynamic_cast<KYBER512*>(k))
+			{
+				auto k = new KYBER(512);
+				k->d.resize(32);
+				k->z.resize(32);
+				prng::prng_t prng;
+				prng.read(k->d.data(), k->d.size());
+				prng.read(k->z.data(), k->z.size());
+				k->p.resize(kyber512_kem::PKEY_LEN);
+				k->s.resize(kyber512_kem::SKEY_LEN);
+				auto req = k->p.size() + k->s.size();
+				if (cbInput != req)
+				{
+					delete k;
+					return STATUS_NOT_SUPPORTED;
+				}
+				memcpy(k->p.data(), pbInput, k->p.size());
+				memcpy(k->s.data(), pbInput + k->p.size(), k->s.size());
+				*phKey = k;
+				return STATUS_SUCCESS;
+			}
+			if (dynamic_cast<KYBER768*>(k))
+			{
+				auto k = new KYBER(768);
+				k->d.resize(32);
+				k->z.resize(32);
+				prng::prng_t prng;
+				prng.read(k->d.data(), k->d.size());
+				prng.read(k->z.data(), k->z.size());
+				k->p.resize(kyber768_kem::PKEY_LEN);
+				k->s.resize(kyber768_kem::SKEY_LEN);
+				auto req = k->p.size() + k->s.size();
+				if (cbInput != req)
+				{
+					delete k;
+					return STATUS_NOT_SUPPORTED;
+				}
+				memcpy(k->p.data(), pbInput, k->p.size());
+				memcpy(k->s.data(), pbInput + k->p.size(), k->s.size());
+				*phKey = k;
+				return STATUS_SUCCESS;
+			}
+			if (dynamic_cast<KYBER1024*>(k))
+			{
+				auto k = new KYBER(1024);
+				k->d.resize(32);
+				k->z.resize(32);
+				prng::prng_t prng;
+				prng.read(k->d.data(), k->d.size());
+				prng.read(k->z.data(), k->z.size());
+				k->p.resize(kyber1024_kem::PKEY_LEN);
+				k->s.resize(kyber1024_kem::SKEY_LEN);
+				auto req = k->p.size() + k->s.size();
+				if (cbInput != req)
+				{
+					delete k;
+					return STATUS_NOT_SUPPORTED;
+				}
+				memcpy(k->p.data(), pbInput, k->p.size());
+				memcpy(k->s.data(), pbInput + k->p.size(), k->s.size());
+				*phKey = k;
+				return STATUS_SUCCESS;
+			}
+
 			return STATUS_NOT_SUPPORTED;
 		};
 
@@ -821,6 +893,24 @@ namespace PK_ALGORITHMS
 			_Out_  ULONG* pcbResult,
 			_In_   ULONG dwFlags)
 		{
+			if (wcscmp(pszBlobType, L"") != 0)
+				return STATUS_NOT_SUPPORTED;
+			PKA* a = (PKA*)hKey;
+			if (auto k = dynamic_cast<KYBER*>(a))
+			{
+				std::vector<uint8_t> m(32);
+				std::vector<uint8_t> cipher;
+				std::vector<uint8_t> shrd_key0(32);
+				auto needs = k->p.size() + k->s.size();
+				*pcbResult = (ULONG)needs;
+				if (!pbOutput || !cbOutput)
+					return STATUS_SUCCESS;
+				if (cbOutput < needs)
+					return STATUS_NOT_SUPPORTED;
+				memcpy(pbOutput, k->p.data(), k->p.size());
+				memcpy(pbOutput + k->p.size(), k->s.data(), k->s.size());
+				return ERROR_SUCCESS;
+			}
 			return STATUS_NOT_SUPPORTED;
 		};
 		m.DestroyKey = [](_Inout_  BCRYPT_KEY_HANDLE hKey
