@@ -359,10 +359,10 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		e1.gen(1024);
 
 		std::vector<unsigned char> key;
-//		e1.exp(key);
+		e1.exp(key);
 	
 		PK e2(algo);
-	//	e2.imp(key);
+		e2.imp(key);
 
 		std::vector<unsigned char> out1;
 		std::vector<unsigned char> out2;
@@ -373,7 +373,7 @@ int __stdcall WinMain(HINSTANCE, HINSTANCE, LPSTR, int)
 		hash.hash((BYTE*)"Hello", 5);
 		hash.get(outx);
 		e1.e((const BYTE*)outx.data(), (DWORD)outx.size(), out1);
-		e1.d(out1.data(), (ULONG)out1.size(), out2);
+		e2.d(out1.data(), (ULONG)out1.size(), out2);
 		assert(memcmp(outx.data(), out2.data(), out2.size()) == 0);
 	}
 
