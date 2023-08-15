@@ -1,0 +1,38 @@
+name: Test SHA3 Hash and Extendable Output Functions using CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Compiler
+      run: |
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 10
+        sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-9 9
+    - name: Get CMake
+      run: sudo apt-get install cmake
+    - name: Setup Google-Test
+      run: |
+        pushd ~
+        git clone https://github.com/google/googletest.git -b v1.13.0
+        pushd googletest
+        mkdir build
+        pushd build
+        cmake .. -DBUILD_GMOCK=OFF
+        make
+        sudo make install
+        popd
+        popd
+        popd
+    - name: Execute Tests
+      run: make
+    - name: Cleanup
+      run: make clean
