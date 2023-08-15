@@ -3,6 +3,8 @@
 An implementation of New algorhtms into CNG (Cryptography New Generation) API so all Windows apps can use them.
 Visual Studio 2022 Solution included.
 
+CodeProject Article: https://www.codeproject.com/Articles/5351727/cngsha3-A-Cryptography-Next-Generation-Implementat
+
 # Algorithms
 SHA-3 (using librhash https://github.com/rhash/RHash/tree/master/librhash)
 Supports SHA-224, SHA-256, SHA-384 and SHA-512
